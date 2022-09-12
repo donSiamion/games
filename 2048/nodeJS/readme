@@ -1,0 +1,6 @@
+console version game 2048
+start -> node main.js
+game keys:
+ for moving - wasd or arroys(up, left, down, right)
+ restart game - ctrl + R
+ close game - ctrl + C

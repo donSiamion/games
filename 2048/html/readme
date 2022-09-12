@@ -1,0 +1,5 @@
+browser version game 2048
+start -> open index.html in browser
+game keys:
+ for moving - wasd or arroys(up, left, down, right), touchscreen swipes
+ for reboot - reload page

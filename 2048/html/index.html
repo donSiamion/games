@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ru" class=" js">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="content-security-policy, initial-scale=1.0">
+    <title>2048</title>
+
+    <script>
+        //logick game-----------------------
+        function setSizePlace(size = 4) {
+            this.sizePlace = size
+        }
+
+        function setLevelGame(level) {
+            this.levelGame = level
+        }
+
+        function createNewPlace() {
+            this.gamePlace = []
+            for (let x = 0; x < this.sizePlace; x++) {
+                let line = [];
+                for (let y = 0; y < this.sizePlace; y++) {
+                    line.push(0)
+                }
+                this.gamePlace.push(line)
+            }
+        }
+
+        function getGamePlace() {
+            if (!this.gamePlace) {
+                this.gamePlace = []
+            }
+            if (this.gamePlace.length === 0) {
+                this.createNewPlace()
+            }
+            return this.gamePlace
+        }
+
+        function getIndexesFreePlce() {
+            let freeIndexesArr = []
+            for (let x = 0; x < this.sizePlace; x++) {
+                for (let y = 0; y < this.sizePlace; y++) {
+                    if (this.gamePlace[x][y] === 0) {
+                        freeIndexesArr.push([x, y])
+                    }
+                }
+            }
+            return freeIndexesArr
+        }
+
+        function addNewItems() {
+            let indexFreePlaces = this.getIndexesFreePlce()
+            for (let i = 0; i < this.levelGame && indexFreePlaces.length > 0; i++) {
+                let numberIndexes = getRandomIntInclusive(0, indexFreePlaces.length - 1)
+                let indexes = indexFreePlaces.splice(numberIndexes, 1)[0]
+                this.gamePlace[indexes[0]][indexes[1]] = 2
+            }
+        }
+
+        function backToPrewiev() {
+            this.gamePlace = JSON.parse(this.prevPlaces.pop()) || this.gamePlace
+        }
+
+        function saveToPrev() {
+            this.prevPlaces.push(JSON.stringify(this.gamePlace))
+        }
+
+        function sumSameElements(arrayElments) {
+            let index = 0;
+            let retArr = JSON.parse(JSON.stringify(arrayElments))
+            let allSums = false;
+            do {
+                if (retArr.length == 1 || index == retArr.length) {
+                    allSums = true
+                }
+                if (retArr[index + 1] && retArr[index] == retArr[index + 1]) {
+                    retArr[index] = retArr[index] + retArr[index + 1]
+                    retArr.splice(index + 1, 1)
+                    index = 0
+                } else {
+                    index++
+                }
+            } while (!allSums);
+            return retArr;
+        }
+
+        function addZerosItems(arrItems, size) {
+            let retArr = JSON.parse(JSON.stringify(arrItems))
+            let addedItems = size - retArr.length
+            for (let i = 0; i < addedItems; i++) {
+                retArr.push(0)
+            }
+            return retArr;
+        }
+
+        function turnLeft() {
+            for (let x = 0; x < this.sizePlace; x++) {
+                let filteredElments = this.gamePlace[x].filter(el => el != 0)
+                this.gamePlace[x] = addZerosItems(sumSameElements(filteredElments), this.sizePlace)
+            }
+        }
+
+        function turnRight() {
+            for (let x = 0; x < this.sizePlace; x++) {
+                let filteredElments = (this.gamePlace[x].filter(el => el != 0)).reverse()
+                this.gamePlace[x] = (addZerosItems(sumSameElements(filteredElments), this.sizePlace)).reverse()
+            }
+        }
+
+        function turnUp() {
+            for (let y = 0; y < this.sizePlace; y++) {
+                let colum = []
+                for (let x = 0; x < this.sizePlace; x++) {
+                    colum.push(this.gamePlace[x][y]);
+                }
+                let filteredElments = colum.filter(el => el != 0)
+                let newColum = addZerosItems(sumSameElements(filteredElments), this.sizePlace)
+                for (let x = 0; x < this.sizePlace; x++) {
+                    this.gamePlace[x][y] = newColum[x];
+                }
+            }
+        }
+
+        function turnDown() {
+            for (let y = 0; y < this.sizePlace; y++) {
+                let colum = []
+                for (let x = 0; x < this.sizePlace; x++) {
+                    colum.push(this.gamePlace[x][y]);
+                }
+                let filteredElments = colum.filter(el => el != 0).reverse()
+                let newColum = (addZerosItems(sumSameElements(filteredElments), this.sizePlace)).reverse()
+                for (let x = 0; x < this.sizePlace; x++) {
+                    this.gamePlace[x][y] = newColum[x];
+                }
+            }
+        }
+
+        function getRandomIntInclusive(min = 0, max = 1) {
+            min = Math.ceil(min);
+            max = Math.floor(max);
+            return Math.floor(Math.random() * (max - min + 1) + min);
+        }
+
+    </script>
+
+    <script>
+        //game events --------------------
+        this.setSizePlace(4)
+        this.createNewPlace()
+        this.setLevelGame(1)
+        this.addNewItems()
+        setTimeout(() => { redrowGamePlace(this.getGamePlace()) }, 100)
+
+        var isTouchCapable = 'ontouchstart' in window ||
+            window.DocumentTouch && document instanceof window.DocumentTouch ||
+            navigator.maxTouchPoints > 0 ||
+            window.navigator.msMaxTouchPoints > 0
+
+        
+        setTimeout(() => { writeLog(isTouchCapable ? 'YES touch': 'NO tuch') }, 100)
+
+        if (isTouchCapable) {
+            swipe_det = new Object()
+            swipe_det.sX = 0
+            swipe_det.sY = 0
+            swipe_det.eX = 0
+            swipe_det.eY = 0
+            var min_x = 20  //min x swipe for horizontal swipe
+            var max_x = 40  //max x difference for vertical swipe
+            var min_y = 40  //min y swipe for vertical swipe
+            var max_y = 50  //max y difference for horizontal swipe
+            var direc = ""
+            document.addEventListener('touchstart', function (e) {
+                var t = e.touches[0]
+                swipe_det.sX = ~~t.screenX
+                swipe_det.sY = ~~t.screenY
+            }, false)
+            document.addEventListener('touchmove', function (e) {
+                e.preventDefault()
+                var t = e.touches[0]
+                swipe_det.eX = ~~t.screenX
+                swipe_det.eY = ~~t.screenY
+            }, false)
+            document.addEventListener('touchend', (e) => {
+                
+                if ((((swipe_det.eX - min_x > swipe_det.sX) || (swipe_det.eX + min_x < swipe_det.sX)) && ((swipe_det.eY < swipe_det.sY + max_y) && (swipe_det.sY > swipe_det.eY - max_y)))) {
+                    direc = (swipe_det.eX > swipe_det.sX ? "r" : "l")
+                }
+                if ((((swipe_det.eY - min_y > swipe_det.sY) || (swipe_det.eY + min_y < swipe_det.sY)) && ((swipe_det.eX < swipe_det.sX + max_x) && (swipe_det.sX > swipe_det.eX - max_x)))) {
+                    direc = (swipe_det.eY > swipe_det.sY ? "d" : "u")
+                }
+                
+                if (direc != "") {
+                    switch (direc) {
+                        case 'u':
+                            this.turnUp()
+                            break;
+                        case 'd':
+                            this.turnDown()
+                            break;
+                        case 'l':
+                            this.turnLeft()
+                            break;
+                        case 'r':
+                            this.turnRight()
+                            break;
+                    }
+                    this.addNewItems()
+                    redrowGamePlace(this.getGamePlace())
+                }
+    
+                direc = ""
+            }, false)
+        } else {
+            document.addEventListener('keydown', pressKey.bind(this))
+
+            function pressKey(e) {
+                switch (e.code) {
+                    case 'KeyW':
+                    case 'ArrowUp':
+                        this.turnUp()
+                        break;
+                    case 'KeyS':
+                    case 'ArrowDown':
+                        this.turnDown()
+                        break;
+                    case 'KeyA':
+                    case 'ArrowLeft':
+                        this.turnLeft()
+                        break;
+                    case 'KeyD':
+                    case 'ArrowRight':
+                        this.turnRight()
+                        break;
+                }
+                if (['KeyW','KeyS','KeyA','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code)) {
+                    this.addNewItems()
+                    redrowGamePlace(this.getGamePlace())
+                }
+            }
+        }
+
+        function redrowGamePlace(gamePlaceObj) {
+            let gamePlaceDiv = document.getElementById('gamePlace')
+            let divLine = ''
+            for (let X = 0; X < gamePlaceObj.length; X++) {
+                const line = gamePlaceObj[X];
+                divLine += '<div class="line">'
+                for (let y = 0; y < line.length; y++) {
+                    divLine += '<div class="column-item" style="background: rgb(255, ' + (240 - (~~(line[y] > 10 ? line[y] / 10 : 0))) + ', 0,' + ((line[y] / 2) + 1024) / 2048 + ');">' + line[y] + '</div>'
+                }
+                divLine += '</div> \n'
+            }
+            gamePlaceDiv.innerHTML = divLine
+        }
+
+        function restartGame() {
+            this.createNewPlace()
+            this.addNewItems()
+            redrowGamePlace(this.getGamePlace())
+        }
+
+    </script>
+
+    <style>
+        .game-place {
+            width: 200px;
+            height: 200px;
+            padding: 50px;
+        }
+
+        .line {
+            height: 50px;
+            display: inline-flex;
+            text-align: center;
+        }
+
+        .column-item {
+            width: 50px;
+            margin: 2px;
+            align-items: center;
+            display: flex;
+            border-radius: 4px;
+            justify-content: center;
+        }
+
+        .restart-button {
+            height: 60px;
+            width: 100px;
+            font-size: 18px;
+            background: #ff6b00c2;
+            border-color: transparent;
+            border: none;
+            margin-left: 108px;
+            margin-top: -40px;
+            position: absolute;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div>
+        <div id="gamePlace" class="game-place">
+            <div class="line">
+                <div class="column">0</div>
+            </div>
+        </div>
+
+        <button onclick="restartGame()" class="restart-button">Restart</button>
+    </div>
+</body>
