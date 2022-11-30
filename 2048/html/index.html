@@ -244,11 +244,25 @@
         function redrowGamePlace(gamePlaceObj) {
             let gamePlaceDiv = document.getElementById('gamePlace')
             let divLine = ''
+            let palette = {
+                "0": {color: "#776e65", background: "#efefef"},
+                "2":    {color : "#776e65", background : "#eee4da"},
+                "4":    {color : "#776e65", background : "#ede0c8"},
+                "8":    {color : "#f9f6f2", background : "#f2b179"},
+                "16":   {color : "#f9f6f2", background : "#f59563"},
+                "32":   {color : "#f9f6f2", background : "#f67c5f"},
+                "64":   {color : "#f9f6f2", background : "#f65e3b"},
+                "128":  {color : "#f9f6f2", background : "#edcf72"},
+                "256":  {color : "#f9f6f2", background : "#edcc61"},
+                "512":  {color : "#f9f6f2", background : "#edc850"},
+                "1024": {color : "#f9f6f2", background : "#edc53f"},
+                "2048": {color : "#f9f6f2", background : "#edc22e"}
+            }
             for (let X = 0; X < gamePlaceObj.length; X++) {
                 const line = gamePlaceObj[X];
                 divLine += '<div class="line">'
                 for (let y = 0; y < line.length; y++) {
-                    divLine += '<div class="column-item" style="background: rgb(255, ' + (240 - (~~(line[y] > 10 ? line[y] / 10 : 0))) + ', 0,' + ((line[y] / 2) + 1024) / 2048 + ');">' + line[y] + '</div>'
+                    divLine += '<div class="column-item" style="background:' + palette[line[y]].background + '; color:' + palette[line[y]].color + '">' + line[y] + '</div>'
                 }
                 divLine += '</div> \n'
             }
