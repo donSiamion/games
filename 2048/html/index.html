@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="content-security-policy, initial-scale=1.0">
     <title>2048</title>
-
+    <!-- game logics -->
     <script>
         //logick game-----------------------
         function setSizePlace(size = 4) {
@@ -14,6 +14,10 @@
 
         function setLevelGame(level) {
             this.levelGame = level
+        }
+
+        function setRandomCoeficent(coeficent) {
+            this.randomCoeficent = coeficent
         }
 
         function createNewPlace() {
@@ -54,7 +58,7 @@
             for (let i = 0; i < this.levelGame && indexFreePlaces.length > 0; i++) {
                 let numberIndexes = getRandomIntInclusive(0, indexFreePlaces.length - 1)
                 let indexes = indexFreePlaces.splice(numberIndexes, 1)[0]
-                this.gamePlace[indexes[0]][indexes[1]] = 2
+                this.gamePlace[indexes[0]][indexes[1]] = getTwoOrFour(this.randomCoeficent)
             }
         }
 
@@ -67,9 +71,9 @@
         }
 
         function sumSameElements(arrayElments) {
-            let index = 0;
+            let index = 0
             let retArr = JSON.parse(JSON.stringify(arrayElments))
-            let allSums = false;
+            let allSums = false
             do {
                 if (retArr.length == 1 || index == retArr.length) {
                     allSums = true
@@ -81,8 +85,8 @@
                 } else {
                     index++
                 }
-            } while (!allSums);
-            return retArr;
+            } while (!allSums)
+            return retArr
         }
 
         function addZerosItems(arrItems, size) {
@@ -91,7 +95,7 @@
             for (let i = 0; i < addedItems; i++) {
                 retArr.push(0)
             }
-            return retArr;
+            return retArr
         }
 
         function turnLeft() {
@@ -112,12 +116,12 @@
             for (let y = 0; y < this.sizePlace; y++) {
                 let colum = []
                 for (let x = 0; x < this.sizePlace; x++) {
-                    colum.push(this.gamePlace[x][y]);
+                    colum.push(this.gamePlace[x][y])
                 }
                 let filteredElments = colum.filter(el => el != 0)
                 let newColum = addZerosItems(sumSameElements(filteredElments), this.sizePlace)
                 for (let x = 0; x < this.sizePlace; x++) {
-                    this.gamePlace[x][y] = newColum[x];
+                    this.gamePlace[x][y] = newColum[x]
                 }
             }
         }
@@ -126,24 +130,28 @@
             for (let y = 0; y < this.sizePlace; y++) {
                 let colum = []
                 for (let x = 0; x < this.sizePlace; x++) {
-                    colum.push(this.gamePlace[x][y]);
+                    colum.push(this.gamePlace[x][y])
                 }
                 let filteredElments = colum.filter(el => el != 0).reverse()
                 let newColum = (addZerosItems(sumSameElements(filteredElments), this.sizePlace)).reverse()
                 for (let x = 0; x < this.sizePlace; x++) {
-                    this.gamePlace[x][y] = newColum[x];
+                    this.gamePlace[x][y] = newColum[x]
                 }
             }
         }
 
         function getRandomIntInclusive(min = 0, max = 1) {
-            min = Math.ceil(min);
-            max = Math.floor(max);
-            return Math.floor(Math.random() * (max - min + 1) + min);
+            min = Math.ceil(min)
+            max = Math.floor(max)
+            return Math.floor(Math.random() * (max - min + 1) + min)
+        }
+
+        function getTwoOrFour(randomCoeficent = 0.7) {
+            return Math.random() < randomCoeficent ? 2 : 4
         }
 
     </script>
-
+    <!-- web logics -->
     <script>
         //game events --------------------
         this.setSizePlace(4)
@@ -259,7 +267,7 @@
                 "2048": {color : "#f9f6f2", background : "#edc22e"}
             }
             for (let X = 0; X < gamePlaceObj.length; X++) {
-                const line = gamePlaceObj[X];
+                const line = gamePlaceObj[X]
                 divLine += '<div class="line">'
                 for (let y = 0; y < line.length; y++) {
                     divLine += '<div class="column-item" style="background:' + palette[line[y]].background + '; color:' + palette[line[y]].color + '">' + line[y] + '</div>'
@@ -273,6 +281,18 @@
             this.createNewPlace()
             this.addNewItems()
             redrowGamePlace(this.getGamePlace())
+        }
+
+        function openSettings() {
+            document.getElementById('settingsIcon').style.display = 'none'
+            document.getElementById('game').style.display = 'none'
+            document.getElementById('settingsPlace').style.display = ''
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsPlace').style.display = 'none'
+            document.getElementById('settingsIcon').style.display = ''
+            document.getElementById('game').style.display = ''
         }
 
     </script>
@@ -317,12 +337,37 @@
 
 <body>
     <div>
-        <div id="gamePlace" class="game-place">
-            <div class="line">
-                <div class="column">0</div>
-            </div>
+        <svg id="settingsIcon" onclick="openSettings()" height="32" version="1.1" width="32" xmlns="http://www.w3.org/2000/svg" style="position: absolute;">
+            <path style="" fill="#444444" stroke="none" d="M15.999,13.48C14.607000000000001,13.48,13.479000000000001,14.608,13.479000000000001,16S14.607000000000001,18.52,15.999,18.52S18.52,17.392,18.52,16S17.391,13.48,15.999,13.48ZM28.799,17.3L28.801,14.699000000000002L25.168,13.523000000000001C24.953,12.726,24.634999999999998,11.973,24.233,11.273000000000001L25.968,7.868000000000002L24.13,6.029000000000002L20.732,7.7650000000000015C20.031,7.360000000000001,19.274,7.042000000000002,18.474999999999998,6.825000000000001L17.299,3.2L14.699,3.1990000000000003L13.525,6.824C12.725,7.04,11.968,7.359999999999999,11.267,7.763999999999999L7.868,6.03L6.029,7.868L7.7669999999999995,11.271C7.364999999999999,11.971,7.045999999999999,12.725000000000001,6.8309999999999995,13.522L3.2,14.7V17.3L6.8309999999999995,18.478C7.045999999999999,19.275000000000002,7.364999999999999,20.028000000000002,7.766,20.727L6.029,24.132L7.867,25.971L11.267,24.236C11.968,24.641000000000002,12.725,24.959,13.523,25.176000000000002L14.7,28.8L17.301,28.801000000000002L18.477999999999998,25.168000000000003C19.273999999999997,24.953000000000003,20.026999999999997,24.635,20.726,24.233000000000004L24.131,25.969000000000005L25.971,24.131000000000004L24.235,20.733000000000004C24.64,20.032000000000004,24.959,19.274000000000004,25.176,18.475000000000005L28.799,17.3ZM19.8,20.1C19.8,20.1,19.033,19.289,19,19.32C18.184,20.055,17.109,20.508,15.954,20.508C13.482000000000001,20.508,11.478000000000002,18.442,11.478000000000002,15.969999999999999S13.482000000000001,11.494,15.954,11.494C18.424,11.494,20.569000000000003,13.498,20.522,15.969999999999999C20.5,17.1,20.2,17.7,19.7,18.5C19.671,18.547,20.599,19.2,20.599,19.2L19.8,20.1Z" stroke-width="0" transform="matrix(1,0,0,1,0,0)"/>
+            <rect x="0" y="0" width="32" height="32" r="0" rx="0" ry="0" fill="#ffffff" stroke="none" style="opacity: 0;" stroke-width="0" opacity="0">
+                <title>Settings</title>
+            </rect>
+        </svg>
+
+        <div id="settingsPlace" class="settings" style="display: none;">
+            <div>Settings</div>
+
+            <div>Gama place size</div>
+            <form name="settings">
+                <div>Size place</div>
+                <input type="number" name="size" value="4">
+                <div>Ratio 2 or 4</div>
+                <input name="coefficent" type="range" min="0" max="1" value="0.6">
+            </form>
+
+            <!-- <button onclick="saveSettings()" class="save-button">Save</button> -->
+            <button onclick="closeSettings()" class="save-button">Close</button>
         </div>
 
-        <button onclick="restartGame()" class="restart-button">Restart</button>
+        <div id="game">
+            <div id="gamePlace" class="game-place">
+                <div class="line">
+                    <div class="column">0</div>
+                </div>
+            </div>
+
+            <button onclick="restartGame()" class="restart-button">Restart</button>
+        </div>
+
     </div>
 </body>
